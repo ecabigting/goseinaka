@@ -2,10 +2,13 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
 
 	"github.com/ecabigting/goseinaka/internal/config"
 	"github.com/ecabigting/goseinaka/internal/database"
+	"github.com/ecabigting/goseinaka/internal/handler"
+	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 )
 
@@ -50,7 +53,7 @@ func main() {
 	}()
 
 	// Check DB Stats
-	var serverInfoMap map[string]interface{}
+	var serverInfoMap map[string]any
 	sqlQuery := "SELECT    NOW() as current_db_time,     current_setting('TimeZone') as db_timezone;"
 	result := db.Raw(sqlQuery).Scan(&serverInfoMap)
 
@@ -67,5 +70,18 @@ func main() {
 		}
 	}
 
-	log.Println("API at port", apiConfig.APIPort)
+	// Setup GIN
+	gin.SetMode(apiConfig.GinMode)
+	// New Gin Router
+	router := gin.New()
+	// Health Check Route
+	healthH := handler.NewHealthHandler(db)
+	router.GET("/health", healthH.Check)
+
+	// Start the HTTP Server
+	serverAddr := fmt.Sprintf(":%s", apiConfig.APIPort)
+	log.Printf("API Server starting on %s", serverAddr)
+	if err := router.Run(serverAddr); err != nil {
+		log.Fatalf("Failed to start Gin server: %s", err)
+	}
 }
