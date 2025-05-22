@@ -1,0 +1,15 @@
+services:
+  goseinaka-api:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    container_name: goseinaka_api_dev
+    ports:
+      # Maps the host port (defined by API_PORT in .env, or defaults to 8080 if API_PORT is not set or empty)
+      - "${API_PORT:-8080}:${API_PORT:-8080}"
+      # ${API_PORT:-8080} means: use the value of the API_PORT environment variable.
+      # If API_PORT is not set or is empty, use 8080 as the default.
+    env_file:
+      - .env
+    volumes:
+      - .:/app
