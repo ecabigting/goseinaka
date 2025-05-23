@@ -7,6 +7,7 @@ import (
 
 	"github.com/ecabigting/goseinaka/internal/config"
 	"github.com/ecabigting/goseinaka/internal/database"
+	"github.com/ecabigting/goseinaka/internal/domain"
 	"github.com/ecabigting/goseinaka/internal/handler"
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
@@ -68,6 +69,19 @@ func main() {
 		} else {
 			log.Printf("INFO: Database Stats:\n%s", string(serverInfoJSON))
 		}
+	}
+
+	// Start DB Migration if needed
+	domainsToMigrate := domain.GetRegisteredModels()
+	if len(domainsToMigrate) > 0 {
+		log.Printf("Found %v number of domains to migrate, starting migration now..", len(domainsToMigrate))
+		err := db.AutoMigrate(domainsToMigrate...)
+		if err != nil {
+			log.Fatalf("Failed to auto-migrate database: %v", err)
+		}
+		log.Println("Database auto-migrate successfull..")
+	} else {
+		log.Println("No Models registered for migration.")
 	}
 
 	// Setup GIN
