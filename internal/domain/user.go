@@ -14,8 +14,7 @@ func init() {
 
 type User struct {
 	gorm.Model         // ID, CreatedAt, UpdatedAt, DeletedAt
-	ID         string  `gorm:"type:uuid;primary_key;default:uuid_generate_v4()"` // Should be string
-	Name       *string `gorm:"size:255"`                                         // Should be *string (pointer)
+	Name       *string `gorm:"size:255"` // Should be *string (pointer)
 	Email      string  `gorm:"type:varchar(100);uniqueIndex;not null"`
 	// EmailVerified stores the timestamp when the user's email was verified. Null if not verified.
 	EmailVerified *time.Time `gorm:"null"`
