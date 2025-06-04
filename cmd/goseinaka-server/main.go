@@ -29,7 +29,7 @@ func main() {
 	if apiConfig.LogLevel == "debug" {
 		apiConfigJSON, jsonErr := json.MarshalIndent(apiConfig, "", " ")
 		if jsonErr != nil {
-			log.Printf("DEBUG: Loaded config fallback: %s", apiConfig)
+			log.Printf("DEBUG: Loaded config fallback: %+v", apiConfig)
 		} else {
 			log.Printf("DEBUG: Loaded config (JSON):\n%s\n", string(apiConfigJSON))
 		}

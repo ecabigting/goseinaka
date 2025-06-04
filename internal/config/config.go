@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"strconv"
 
 	"github.com/joho/godotenv"
 )
@@ -12,6 +13,8 @@ type Config struct {
 	APIPort            string
 	APIKey             string
 	JWTSecret          string
+	JWTAccessTokenTTL  int
+	JWTRefreshTokenTTL int
 	DatabaseURL        string
 	GoogleClientID     string
 	GoogleClientSecret string
@@ -21,6 +24,8 @@ type Config struct {
 
 const (
 	defaultAPIPort = "8080"
+	aTokenTTL      = 15   // 15 mins default
+	rTokenTTL      = 3600 // 3600 mins default
 )
 
 func Load() (*Config, error) {
@@ -48,6 +53,18 @@ func Load() (*Config, error) {
 	cfg.JWTSecret = os.Getenv("JWT_SECRET")
 	if cfg.JWTSecret == "" {
 		return nil, fmt.Errorf("empty JWT Secret")
+	}
+
+	// GET access token time to live
+	cfg.JWTAccessTokenTTL, err = strconv.Atoi(os.Getenv("JWT_AccessToken_TTL"))
+	if err != nil {
+		cfg.JWTAccessTokenTTL = aTokenTTL
+	}
+
+	// GET refresh token time to live
+	cfg.JWTRefreshTokenTTL, err = strconv.Atoi(os.Getenv("JWT_RefreshToken_TTL"))
+	if err != nil {
+		cfg.JWTRefreshTokenTTL = rTokenTTL
 	}
 
 	// Get Database URL
